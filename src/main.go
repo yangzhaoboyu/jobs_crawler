@@ -33,13 +33,16 @@ func main() {
 	//工资收入水平 https://www.jobui.com/salary/全国-销售经理/
 	//就业形势 https://www.jobui.com/trends/全国-销售经理/
 
-	careerNames := make([]string, 0, 1)
+	careerNames := make(map[string]int)
 	careers := make(map[string]Career)
+
 	job := colly.NewCollector()
 	job.OnHTML(".job-list-box", func(element *colly.HTMLElement) {
 		element.DOM.Find(".j-work-detail-list a").Each(func(i int, selection *goquery.Selection) {
 			if selection.Text() != "" {
-				careerNames = append(careerNames, selection.Text())
+				if _, ok := careerNames[selection.Text()]; !ok {
+					careerNames[selection.Text()] = i
+				}
 			}
 		})
 	})
@@ -140,7 +143,10 @@ func main() {
 	}
 	var row *xlsx.Row
 	var cell *xlsx.Cell
-	for _, career := range careerNames {
+
+	fmt.Printf("共找到 %d 个职业", len(careerNames))
+
+	for career := range careerNames {
 
 		salaryUrl := fmt.Sprintf(salaryUrl, url.QueryEscape(fmt.Sprintf("全国-%s", career)))
 		salary.Visit(salaryUrl)
