@@ -78,16 +78,14 @@ func main() {
 		//薪资及工作年限
 		exper := make(map[string]string)
 		s := strings.TrimSpace(element.DOM.Find("#workLen-dataInfoss").Text())
-		if s == "" {
-			return
+		if s != "" {
+			target := s[strings.Index(s, "其中")+6 : strings.LastIndex(s, "，")]
+			speeds := strings.Split(target, "，")
+			for _, speed := range speeds {
+				ex := strings.Split(speed, "工资")
+				exper[ex[0]] = ex[1]
+			}
 		}
-		target := s[strings.Index(s, "其中")+6 : strings.LastIndex(s, "，")]
-		speeds := strings.Split(target, "，")
-		for _, speed := range speeds {
-			ex := strings.Split(speed, "工资")
-			exper[ex[0]] = ex[1]
-		}
-
 		career := Career{
 			Name:       name,
 			AvgSalary:  strings.TrimSpace(element.DOM.Find(".salary-avger").Text()),
